@@ -21,6 +21,7 @@ cisco-ucs*
 storedstate
 
 netsim/
+README.netsim
 
 .DS_Store
 ~*

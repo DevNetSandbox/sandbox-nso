@@ -1,0 +1,26 @@
+<config-template xmlns="http://tail-f.com/ns/config/1.0">
+
+    <devices xmlns="http://tail-f.com/ns/ncs">
+        <device>
+            <name>{$DEVICE_NAME}</name>
+            <config>
+            <vrf xmlns="http://tail-f.com/ned/cisco-nx">
+                <context>
+                    <id>{$VRFNAME}</id>
+                    <ip>
+                        <route>
+                            <ip-route-list>
+                                <prefix-mask>{$STATIC_ROUTE_NETWORK}</prefix-mask>
+                                <next-hop>{$STATIC_ROUTE_GATEWAY}</next-hop>
+                            </ip-route-list>
+                        </route>
+                    </ip>
+                </context>
+            </vrf>
+
+            </config>
+        </device>
+    </devices>
+
+
+</config-template>

@@ -1,0 +1,61 @@
+<config-template xmlns="http://tail-f.com/ns/config/1.0">
+
+  <devices xmlns="http://tail-f.com/ns/ncs">
+  <device>
+    <name>{$DEVICE_NAME}</name>
+      <config>
+
+      <feature xmlns="http://tail-f.com/ned/cisco-nx">
+        <?if {$VPC_ENABLED}?>
+        <vpc/>
+        <?end?>
+        <lacp/>
+        <?if {$LAYER3 = 'true'} ?>
+        <hsrp/>
+        <ospf/>
+        <interface-vlan/>        
+        <?end?>
+      </feature>
+
+      <?if {$VPC_ENABLED}?>
+      <vpc xmlns="http://tail-f.com/ned/cisco-nx">
+        <domain>
+          <id>{$VPC_DOMAIN_ID}</id>
+          <peer-gateway/>
+          <?if {$VPC_PEER_KEEPALIVE_DESTINATION}?>
+          <peer-keepalive>
+            <destination>{$VPC_PEER_KEEPALIVE_DESTINATION}</destination>
+            <source>{$VPC_PEER_KEEPALIVE_SOURCE}</source>
+          </peer-keepalive>
+          <?end?>
+          <peer-switch/>
+        </domain>
+      </vpc>
+
+      <interface xmlns="http://tail-f.com/ned/cisco-nx">
+      <port-channel>
+        <name>{$VPC_PEERLINK_ID}</name>
+        <enable>
+          <switchport>true</switchport>
+        </enable>
+        <mtu>{$MTU_SIZE}</mtu>
+        <spanning-tree>
+          <port>
+            <type>network</type>
+          </port>
+        </spanning-tree>
+        <switchport>
+          <mode>trunk</mode>
+        </switchport>
+        <vpc>
+          <peer-link/>
+        </vpc>
+      </port-channel>
+      </interface>
+      <?end?>
+
+      </config>
+  </device>
+  </devices>
+
+</config-template>

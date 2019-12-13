@@ -1,0 +1,23 @@
+<config-template xmlns="http://tail-f.com/ns/config/1.0">
+
+    <devices xmlns="http://tail-f.com/ns/ncs">
+        <device>
+            <name>{$DEVICE_NAME}</name>
+            <config>
+                <!-- NX-OS 9000 -->
+                <system xmlns="http://tail-f.com/ned/cisco-nx">
+                    <jumbomtu>{$FRAME_SIZE}</jumbomtu>
+                </system>
+
+                <!-- Catalyst 3850/9300 -->
+                <system xmlns="urn:ios">
+                    <mtu>
+                    <size>{$FRAME_SIZE}</size>
+                    </mtu>
+                </system>                
+            </config>
+        </device>
+    </devices>
+
+
+</config-template>

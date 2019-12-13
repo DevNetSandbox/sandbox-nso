@@ -1,0 +1,30 @@
+<config-template xmlns="http://tail-f.com/ns/config/1.0">
+
+    <devices xmlns="http://tail-f.com/ns/ncs">
+        <device>
+            <name>{$DEVICE_NAME}</name>
+            <config>
+            <vrf xmlns="http://tail-f.com/ned/cisco-nx">
+                <context>
+                    <id>{$VRFNAME}</id>
+                </context>
+            </vrf>
+
+            <router xmlns="http://tail-f.com/ned/cisco-nx">
+                <ospf>
+                <id>1</id>
+                <vrf>
+                    <name>{$VRFNAME}</name>
+                    <passive-interface>
+                        <default/>
+                    </passive-interface>
+                </vrf>
+                </ospf>
+            </router>
+
+            </config>
+        </device>
+    </devices>
+
+
+</config-template>

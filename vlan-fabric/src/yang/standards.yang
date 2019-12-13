@@ -1,0 +1,72 @@
+module standards {
+
+    namespace "http://example.com/standards";
+        prefix standards;
+
+    import ietf-inet-types {
+        prefix inet;
+    }
+    import tailf-common {
+        prefix tailf;
+    }
+    import tailf-ncs {
+        prefix ncs;
+    }
+
+    list ip-list {
+        key name; 
+
+        leaf name {
+            type string; 
+        }
+
+        leaf description { 
+            type string; 
+        }
+
+        list ip4 { 
+            key ip; 
+
+            leaf ip {
+                type inet:ipv4-address;
+            }
+
+            leaf description {
+                type string;
+            }
+        }
+    }
+
+    list port-list {
+        key name;
+
+        leaf name {
+            type string; 
+        }
+
+        leaf description { 
+            type string; 
+        }
+
+        list port { 
+            key "protocol portnum"; 
+
+            leaf protocol {
+                type enumeration {
+                    enum tcp; 
+                    enum udp;
+                }
+            }
+
+            leaf portnum {
+                type uint32;
+            }
+
+            leaf description {
+                type string;
+            }
+        }
+    }
+
+  
+}

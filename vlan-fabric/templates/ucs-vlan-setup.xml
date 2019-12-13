@@ -1,0 +1,25 @@
+<config-template xmlns="http://tail-f.com/ns/config/1.0">
+
+    <devices xmlns="http://tail-f.com/ns/ncs">
+        <device>
+            <name>{$DEVICE_NAME}</name>
+            <config>
+
+                <eth-uplink xmlns="http://tail-f.com/ned/cisco-ucs">
+
+                <vlan>
+                    <name>{$VLAN_NAME}</name>
+                    <id>{$VLAN_ID}</id>
+                    <localize/>
+                    <native>no</native>
+                </vlan>
+
+                </eth-uplink>
+
+
+            </config>
+        </device>
+    </devices>
+
+
+</config-template>

@@ -1,0 +1,19 @@
+<ncs-package xmlns="http://tail-f.com/ns/ncs-packages">
+  <name>vlan-fabric</name>
+  <package-version>1.0</package-version>
+  <description>Set of services that manage the Layer 2 and Layer 3 elements of a VLAN based network</description>
+  <ncs-min-version>4.7</ncs-min-version>
+
+  <component>
+    <name>main</name>
+    <application>
+      <python-class-name>vlan_fabric.main.Main</python-class-name>
+    </application>
+  </component>
+
+  <required-package>
+    <name>resource-manager</name>
+    <!-- <name>cisco-ucs-cli-3.3</name> -->
+  </required-package>
+
+</ncs-package>

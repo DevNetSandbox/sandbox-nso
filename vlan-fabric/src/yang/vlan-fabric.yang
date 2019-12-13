@@ -1,0 +1,190 @@
+module vlan-fabric {
+
+  namespace "http://example.com/vlan-fabric";
+  prefix vlan-fabric;
+
+  import ietf-inet-types {
+    prefix inet;
+  }
+  import tailf-common {
+    prefix tailf;
+  }
+  import tailf-ncs {
+    prefix ncs;
+  }
+
+  // TODO Import UCS so can refer to it in leafref 
+  import tailf-ned-cisco-ucs {
+    prefix ucs;
+  }
+
+  import cisco-ucs-cli {
+    prefix cisco-ucs-cli;
+  }
+
+  description
+    "This service simplifies the management of a VLAN based fabric. It creates NX-OS VPC relationships between switch-pairs, manages VLAN Trunks between switches, and provides a baseline for creating VLAN-TENANTS on the fabric.";
+
+  revision 2019-12-10 {
+    description
+      "Initial revision.";
+  }
+
+  list vlan-fabric {
+    description "A collection of network devices that make up a layer2/vlan fabric.";
+
+    key name;
+    leaf name {
+      tailf:info "Fabric Name";
+      tailf:cli-allow-range;
+      type string;
+    }
+
+    uses ncs:service-data;
+    ncs:servicepoint vlan-fabric-servicepoint;
+
+  list switch-pair {
+    ordered-by user; 
+
+    key name;
+    leaf name {
+      type string; 
+      tailf:info "Name of pair";
+    }
+
+    leaf layer3 {
+      type boolean; 
+      default false;
+    }
+
+    leaf primary {
+      type leafref {
+        path "/ncs:devices/ncs:device/ncs:name";
+      }
+    }
+
+    leaf secondary {
+      type leafref {
+        path "/ncs:devices/ncs:device/ncs:name";
+      }
+    }
+
+    container vpc-peerlink {
+      leaf id {
+        type int16;
+        // Question: Validate as interface, maybe a reference? 
+      }
+      list interface {
+        key interface;
+        leaf interface {
+          type string; 
+          // TODO: Validate as interface, maybe a reference? 
+        }
+      }
+    }
+
+    list fabric-trunk {
+      key portchannel-id; 
+      leaf portchannel-id{
+        type int16; 
+        // TODO: Validate as interface, maybe a reference? 
+      }
+
+      list interface {
+        key interface;
+        leaf interface {
+          type string; 
+          // TODO: Validate as interface, maybe a reference? 
+        }
+      }
+    }   
+  }
+
+  list switch {
+    ordered-by user; 
+
+    key device; 
+    leaf device {
+      type leafref {
+        path "/ncs:devices/ncs:device/ncs:name"; 
+      }
+    }
+
+    list fabric-trunk {
+      key portchannel-id; 
+      leaf portchannel-id{
+        type int16; 
+        // TODO: Validate as interface, maybe a reference? 
+      }
+
+      list interface {
+        key interface;
+        leaf interface {
+          type string; 
+          // TODO: Validate as interface, maybe a reference? 
+        }
+      }
+    } 
+
+  }
+
+  list fabric-interconnect {
+    key device; 
+    leaf device {
+      type leafref {
+        path "/ncs:devices/ncs:device/ncs:name"; 
+      }
+      must "derived-from-or-self(deref(.)/../ncs:device-type/ncs:cli/ncs:ned-id, 'cisco-ucs-cli:cisco-ucs-cli')" {
+        tailf:dependency ".";
+      }
+    
+      // TODO Restrict allowed devices to just FIs 
+    }
+
+    list vnic-template-trunks {
+      key "org vnic-template"; 
+      leaf org {
+        // type string; 
+        // TODO How to correctly build a leafref to config data from UCS 
+        type leafref {
+          path "/ncs:devices/ncs:device[ncs:name=current()/../../device]/ncs:config/ucs:org/ucs:org/ucs:name"; 
+        }
+      }
+
+      leaf vnic-template {
+        // type string; 
+        // TODO How to correctly build a leafref to config data from UCS 
+        type leafref {
+          path "/ncs:devices/ncs:device[ncs:name=current()/../../device]/ncs:config/ucs:org/ucs:org[ucs:name=current()/../org]/ucs:vnic-templ/ucs:name"; 
+        }
+      }
+    }
+      
+    }
+
+  list vmware-dvs {
+    key "vcenter datacenter dvs"; 
+    leaf vcenter {
+      type leafref {
+        path "/ncs:devices/ncs:device/ncs:name"; 
+      }
+      // TODO Restrict allowed devices to just vCenter 
+    }
+
+    leaf datacenter {
+      type string;
+      // TODO leaf ref for a dvs from config of vcenter
+    }
+
+
+    leaf dvs {
+      type string;
+      // TODO leaf ref for a dvs from config of vcenter
+    }
+      
+    }
+
+  }
+
+  }
+

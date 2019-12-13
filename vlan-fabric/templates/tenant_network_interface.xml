@@ -1,0 +1,91 @@
+<config-template xmlns="http://tail-f.com/ns/config/1.0">
+
+  <devices xmlns="http://tail-f.com/ns/ncs">
+  <device>
+    <name>{$DEVICE_NAME}</name>
+      <config>
+
+      <!-- NX-OS Template -->
+      <interface xmlns="http://tail-f.com/ned/cisco-nx">
+      <Ethernet>
+        <name>{$INTERFACE_ID}</name>
+        <enable>
+          <switchport>true</switchport>
+        </enable>
+        <mtu>{$MTU_SIZE}</mtu>
+        <?if {$DESCRIPTION}?>
+        <description>{$DESCRIPTION}</description>
+        <?end?>
+        <switchport>
+        <?if {$MODE = "trunk"}?>
+          <mode>trunk</mode>
+          <trunk>
+            <allowed>
+              <vlan>
+                <ids>{$VLAN_ID}</ids>
+              </vlan>
+            </allowed>
+          </trunk>
+        <?else?>
+          <mode>access</mode>
+          <access>
+            <vlan>{$VLAN_ID}</vlan>
+          </access>
+        <?end?>
+        </switchport>
+        <shutdown tags="delete" />
+      </Ethernet>
+      </interface>
+
+      <!-- IOS Template -->
+      <!-- TODO: Figure out how to deal with different interface types in IOS -->
+      <interface xmlns="urn:ios">
+        <GigabitEthernet>
+          <name>{$INTERFACE_ID}</name>
+          <negotiation>
+            <auto>false</auto>
+          </negotiation>
+        <?if {$DESCRIPTION}?>
+        <description>{$DESCRIPTION}</description>
+        <?end?>
+          <switchport>
+            <trunk>
+              <encapsulation>dot1q</encapsulation>
+            </trunk>
+            <mode>
+            <?if {$MODE = "trunk"}?>
+              <trunk/>
+            <?else?>
+              <access/>
+            <?end?>
+            </mode>
+
+            <?if {$MODE = "trunk"}?>
+            <trunk>
+                <allowed>
+                    <vlan>
+                        <vlans>{$VLAN_ID}</vlans>
+                    </vlan>
+                </allowed>
+            </trunk>
+            <?else?>
+            <access>
+                <vlan>{$VLAN_ID}</vlan>
+            </access>
+            <?end?>
+
+          </switchport>
+
+          <!-- <channel-group>
+            <number>{$PORTCHANNEL_ID}</number>
+            <mode>active</mode>
+          </channel-group> -->
+
+        </GigabitEthernet>
+      </interface>      
+
+      </config>
+  </device>
+  </devices>
+
+</config-template>

@@ -1,0 +1,42 @@
+<config-template xmlns="http://tail-f.com/ns/config/1.0">
+
+    <devices xmlns="http://tail-f.com/ns/ncs">
+        <device>
+            <name>{$DEVICE_NAME}</name>
+            <config>
+
+                <vCenter xmlns="http://tail-f.com/ned/vmware-vsphere-portgroup-cfg">
+                    <datacenter>
+                    <name>{$VMWARE_DATACENTER}</name>
+
+                    <portgroup>
+                        <portgroup-name>{$VLAN_NAME}</portgroup-name>
+                        <virtual-switch>{$VMWARE_DVS}</virtual-switch>
+                        <vlan-id>{$VLAN_ID}</vlan-id>
+                        <security>
+                            <promiscuous>reject</promiscuous>
+                            <forgedTransmits>reject</forgedTransmits>
+                            <macChanges>reject</macChanges>
+                        </security>
+                        <failover>
+                            <load-balancing>loadbalance_srcid</load-balancing>
+                        </failover>                        
+                    </portgroup>
+
+
+                    <!-- <vSwitch>
+                        <name>testdvs</name>
+                        <uuid>50 10 3c 15 e6 96 1f b4-7d d9 32 7c 6c c4 5f c0</uuid>
+                    </vSwitch> -->
+
+
+                    </datacenter>
+                </vCenter>
+
+
+            </config>
+        </device>
+    </devices>
+
+
+</config-template>

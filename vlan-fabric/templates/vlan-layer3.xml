@@ -1,0 +1,77 @@
+<config-template xmlns="http://tail-f.com/ns/config/1.0">
+
+    <devices xmlns="http://tail-f.com/ns/ncs">
+        <device>
+            <name>{$DEVICE_NAME}</name>
+            <config>
+            <feature xmlns="http://tail-f.com/ned/cisco-nx">
+                <hsrp/>
+                <ospf/>
+                <interface-vlan/>        
+            </feature>
+
+
+            <vrf xmlns="http://tail-f.com/ned/cisco-nx">
+                <context>
+                <id>{$VRFNAME}</id>
+                </context>
+            </vrf>
+
+            <router xmlns="http://tail-f.com/ned/cisco-nx">
+                <ospf>
+                <id>1</id>
+                <vrf>
+                    <name>{$VRFNAME}</name>
+                    <passive-interface>
+                        <default/>
+                    </passive-interface>
+                </vrf>
+                </ospf>
+            </router>
+
+            <interface xmlns="http://tail-f.com/ned/cisco-nx">
+                <Vlan>
+                <name>{$VLAN_ID}</name>
+                <vrf>
+                    <member>{$VRFNAME}</member>
+                </vrf>
+                <ip>
+                    <address>
+                    <ipaddr>{$SVI_IPV4}</ipaddr>
+                    </address>
+                    <router>
+                        <ospf>
+                            <name>1</name>
+                            <area>0.0.0.0</area>
+                        </ospf>
+                    </router>
+                    <?if {$BUILD_ROUTING_NEIGHBOR}?>
+                    <ospf>
+                        <passive-interface>false</passive-interface>
+                    </ospf>
+                    <?end?>
+                    <redirects>false</redirects>
+                </ip>
+                <ipv6>
+                    <redirects>false</redirects>
+                </ipv6>
+                <hsrp>
+                    <version>2</version>
+                    <hsrp-list>
+                    <id>{$HSRP_GROUP}</id>
+                    <addr_type>ipv4</addr_type>
+                    <ip>
+                        <address>{$HSRP_IPV4}</address>
+                    </ip>
+                    <preempt/>
+                    <priority>{$HSRP_PRIORITY}</priority>
+                    </hsrp-list>
+                </hsrp>
+                </Vlan>
+            </interface>
+            </config>
+        </device>
+    </devices>
+
+
+</config-template>

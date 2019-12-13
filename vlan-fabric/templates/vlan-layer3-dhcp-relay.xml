@@ -1,0 +1,30 @@
+<config-template xmlns="http://tail-f.com/ns/config/1.0">
+
+    <devices xmlns="http://tail-f.com/ns/ncs">
+        <device>
+            <name>{$DEVICE_NAME}</name>
+            <config>
+            <feature xmlns="http://tail-f.com/ned/cisco-nx">
+                <dhcp/>
+            </feature>
+
+            <interface xmlns="http://tail-f.com/ned/cisco-nx">
+                <Vlan>
+                <name>{$VLAN_ID}</name>
+                    <ip>
+                        <dhcp>
+                        <relay>
+                            <address>
+                            <id>{$DHCP_RELAY_ADDRESS}</id>
+                            </address>
+                        </relay>
+                        </dhcp>
+                    </ip>
+                </Vlan>
+            </interface>
+            </config>
+        </device>
+    </devices>
+
+
+</config-template>

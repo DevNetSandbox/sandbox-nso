@@ -1,0 +1,93 @@
+<config-template xmlns="http://tail-f.com/ns/config/1.0">
+
+  <devices xmlns="http://tail-f.com/ns/ncs">
+  <device>
+    <name>{$DEVICE_NAME}</name>
+      <config>
+
+      <!-- NX-OS Template -->
+      <interface xmlns="http://tail-f.com/ned/cisco-nx">
+      <port-channel>
+        <name>{$PORTCHANNEL_ID}</name>
+        <enable>
+          <switchport>true</switchport>
+        </enable>
+        <shutdown tags="delete" />
+        <mtu>{$MTU_SIZE}</mtu>
+        <?if {$DESCRIPTION}?>
+        <description>{$DESCRIPTION}</description>
+        <?end?>
+        <switchport>
+        <?if {$MODE = "trunk"}?>
+          <mode>trunk</mode>
+          <?if {$VLAN_ID != "all"}?>
+          <trunk>
+            <allowed>
+              <vlan>
+                <ids>{$VLAN_ID}</ids>
+              </vlan>
+            </allowed>
+          </trunk>
+          <?end?>
+        <?else?>
+          <mode>access</mode>
+          <access>
+            <vlan>{$VLAN_ID}</vlan>
+          </access>
+        <?end?>
+        </switchport>
+        <?if {$VPC}?>
+        <vpc>
+          <port-channel-number>{$PORTCHANNEL_ID}</port-channel-number>
+        </vpc>
+        <?end?>
+      </port-channel>
+      </interface>
+
+      <!-- IOS Template -->
+      <interface xmlns="urn:ios">
+        <Port-channel>
+          <name>{$PORTCHANNEL_ID}</name>
+        <?if {$DESCRIPTION}?>
+        <description>{$DESCRIPTION}</description>
+        <?end?>
+          <switchport>
+            <!-- Newer switches don't support.. how to check version for command, for now disabling -->
+            <?if {$DISABLE_TRUNK_NEGOTIATION = "true"}?>
+            <trunk>
+              <encapsulation>dot1q</encapsulation>
+            </trunk>
+            <?end?>
+            <mode>
+            <?if {$MODE = "trunk"}?>
+              <trunk/>
+            <?else?>
+              <access/>
+            <?end?>
+            </mode>
+
+            <?if {$MODE = "trunk"}?>
+            <trunk>
+                <?if {$VLAN_ID != "all"}?>
+                <allowed>
+                    <vlan>
+                        <vlans>{$VLAN_ID}</vlans>
+                    </vlan>
+                </allowed>
+                <?end?>
+            </trunk>
+            <?else?>
+            <access>
+                <vlan>{$VLAN_ID}</vlan>
+            </access>
+            <?end?>
+
+          </switchport>
+        </Port-channel>
+      </interface> 
+
+      </config>
+  </device>
+  </devices>
+
+</config-template>

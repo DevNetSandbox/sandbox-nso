@@ -1,10 +1,14 @@
 clean: nso-clean netsim-clean
 
-dev: netsim nso 
+dev: netsim nso netsim-load-base 
 
 nso: nso-setup nso-sync-from
 
 netsim: netsim-create netsim-start
+
+dev-fabric: dev-vlan-fabric dev-vlan-tenant 
+
+dev-full: dev dev-fabric
 
 nso-setup:
 	-@echo "Setting up local NSO instance..."
@@ -13,7 +17,8 @@ nso-setup:
 	  --package cisco-ios-cli-6.33 \
 	  --package cisco-asa-cli-6.7 \
 	  --package cisco-ucs-cli-3.3 \
-	  --package /Users/hapresto/ncs5203/packages/services/resource-manager \
+	  --package vmware-vsphere-gen-3.2 \
+	  --package resource-manager \
 	  --package ./vlan-fabric \
 	  --dest .
 	-@ncs
@@ -31,7 +36,6 @@ nso-clean:
 	-@echo "Stopping NSO..."
 	-@ncs --stop
 	-@rm -Rf README.ncs agentStore state.yml logs/ ncs-cdb/ ncs-java-vm.log ncs-python-vm.log ncs.conf state/ storedstate target/ packages/ scripts/
-
 
 netsim-create:
 	-@echo "Setting Up Netsim Instances..."
@@ -63,8 +67,25 @@ netsim-start:
 	-@echo "Starting All Netsim Instances..."
 	-@ncs-netsim start
 
+netsim-load-base:
+	-@echo "Loading base netsim configurations through NSO..."
+	-@ncs_load -lmn nso-configurations/netsim-device-base-configs.xml
+	-@curl -X POST -u admin:admin http://localhost:8080/api/running/devices/_operations/sync-to
+
 netsim-clean:
 	-@echo "Stopping All Netsim Instances..."
 	-@killall confd
 	-@rm -Rf netsim/
 	-@rm README.netsim
+
+dev-vlan-fabric:
+	-@echo "Loading sample vlan-fabric configuration..."
+	-@ncs_load -lmn nso-configurations/sample-vlan-fabrics.xml
+	-@curl -X POST -u admin:admin http://localhost:8080/api/running/vlan-fabric/internal/_operations/re-deploy
+	-@curl -X POST -u admin:admin http://localhost:8080/api/running/vlan-fabric/dmz01/_operations/re-deploy
+	-@curl -X POST -u admin:admin http://localhost:8080/api/running/vlan-fabric/dmz02/_operations/re-deploy
+
+dev-vlan-tenant:
+	-@echo "Loading sample vlan-tenant configuration..."
+	-@ncs_load -lmn nso-configurations/sample-vlan-tenants.xml
+	-@curl -X POST -u admin:admin http://localhost:8080/api/running/devices/_operations/sync-to

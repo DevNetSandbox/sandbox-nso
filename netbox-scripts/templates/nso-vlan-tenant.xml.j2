@@ -1,0 +1,83 @@
+<config xmlns="http://tail-f.com/ns/config/1.0">
+  <vlan-tenant xmlns="http://example.com/vlan-tenant">
+    <name>{{ vlan_tenant.name }}</name>
+    <fabric>{{ vlan_tenant.fabric }}</fabric>
+
+    {# Loop over networks -#}
+    {% for vlan in vlans -%}
+    <network>
+      <name>{{ vlan.name }}</name>
+      <vlanid>{{ vlan.vid }}</vlanid>
+      <network>{{ vlan.prefix.prefix }}</network>
+      {% if not vlan.custom_fields['layer3-on-fabric'] -%}
+      {# Conditional for l3  -#}
+      <layer3-on-fabric>false</layer3-on-fabric>
+      {% elif vlan.custom_fields['layer3-on-fabric'] -%}
+      <layer3-on-fabric>true</layer3-on-fabric>
+      {% endif -%}
+      {% if vlan.custom_fields['layer3-on-fabric'] and vlan.role.name == "Transit Network" -%}
+      <build-route-neighbors>true</build-route-neighbors>
+      {% endif -%}
+
+      {# TODO: Do not double render switch-pairs -#}
+      {# Loop over connections -#}
+      {% for connection in vlan.connections -%}
+      {% if not connection.lag -%}
+      {% if connection.device.device_role.name in ["Access Switch", "Spine Switch", "Border Switch", "Distributed Virtual Switch - VIRL", "Distribution Switch"] -%}
+      <connections>
+        {# loop switch-pairs -#}
+        {% if connection.device.cluster -%}
+        <switch-pair>
+          <name>{{ connection.device.cluster }}</name>
+        {% else -%}
+        <switch>
+          <device>{{ connection.device.name }}</device>
+        {% endif -%}
+
+          {% if connection.form_factor.label == "Link Aggregation Group (LAG)" -%}
+          {# conditional for connection type port-channel  -#}
+          <port-channel>
+            <portchannel-id>{{ connection.name|interface_num }}</portchannel-id>
+            {% if connection.description -%}
+            <description>{{ connection.description }}</description>
+            {% endif -%}
+            {% if connection.mode.label == "Access" -%}
+            <mode>access</mode>
+            {% else -%}
+            <mode>trunk</mode>
+            {% endif -%}
+            <interface>
+              {# Loop over port-channel members -#}
+              {% for member in connection.lag_members -%}
+              <interface>{{ member.name|interface_num }}</interface>
+              {% endfor -%}
+            </interface>
+          </port-channel>
+          {% else -%}
+          {# conditional for connection type interface  -#}
+          <interface>
+            <interface>{{ connection.name|interface_num }}</interface>
+            {% if connection.description -%}
+            <description>{{ connection.description }}</description>
+            {% endif -%}
+            {% if connection.mode.label == "Access" -%}
+            <mode>access</mode>
+            {% else -%}
+            <mode>trunk</mode>
+            {% endif -%}
+          </interface>
+          {% endif -%}
+
+        {% if connection.device.cluster -%}
+        </switch-pair>
+        {% else -%}
+        </switch>
+        {% endif -%}
+      </connections>
+      {% endif -%}
+      {% endif -%}
+      {% endfor -%}
+    </network>
+    {% endfor -%}
+  </vlan-tenant>
+</config>

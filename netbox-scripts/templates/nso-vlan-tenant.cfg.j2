@@ -1,0 +1,27 @@
+vlan-tenant {{ vlan_tenant.name }}
+  fabric {{ vlan_tenant.fabric }}
+  !
+  {% for vlan in vlans %}network {{ vlan.name }}
+    vlanid {{ vlan.vid }}
+    network {{ vlan.prefix.prefix }}
+    {% if not vlan.custom_fields['layer3-on-fabric'] %}layer3-on-fabric false{% elif vlan.custom_fields['layer3-on-fabric'] -%}layer3-on-fabric true{% endif -%}
+    {% if vlan.custom_fields['layer3-on-fabric'] and vlan.role.name == "Transit Network" %}build-route-neighbors true {% endif %}
+    {% for connection in vlan.connections %} {% if not connection.lag %} {% if connection.device.device_role.name in ["Access Switch", "Spine Switch", "Border Switch", "Distributed Virtual Switch - VIRL", "Distribution Switch"] -%}
+    {% if connection.device.cluster %}connections switch-pair {{ connection.device.cluster }}
+    {% else %}connections switch {{ connection.device.name }}{% endif %}
+
+    {% if connection.form_factor.label == "Link Aggregation Group (LAG)" %}port-channel {{ connection.name|interface_num }}
+    {% if connection.description %}description {{ connection.description }}{% endif %}
+    {% if connection.mode.label == "Access" %}mode access
+    {% else %}mode trunk{% endif %}
+      {% for member in connection.lag_members %}interface {{ member.name|interface_num }}{% endfor %}
+
+    {% else %}interface {{ connection.name|interface_num }}
+      {% if connection.description %}description {{ connection.description }}{% endif %}
+      {% if connection.mode.label == "Access" %}mode access
+      {% else %}mode trunk{% endif %}
+  {% endif %}
+  {% endif %}
+  {% endif %}
+  {% endfor %}
+{% endfor %}

@@ -140,3 +140,21 @@ You can add as many `network` objects to the tenant as you desire.  Each `networ
 If there are any physical network connections into a network needed, you can specify them with `connections`.  
 
 For a more complete example of `vlan-tenant` configurations, you can look at [sample-vlan-tenants.cfg](nso-configurations/sample-vlan-tenants.cfg) or [sample-vlan-tenants.xml](nso-configurations/sample-vlan-tenants.xml)
+
+## netbox-scripts 
+In DevNet Sandbox we strive to use a Source of Truth driven infrastructure.  Our Source of Truth is [netbox](https://netbox.readthedocs.io), and it is where our network configuration and validation data comes from.  In the [`netbox-scripts`](netbox-scripts) folder you'll find a sample of scripts that we use as part of our production automation jobs and routines.  As every organizations network will be unique, we provide these scripts not with the idea they can be used as-is, but rather as examples of how such integration might be done.  
+
+Some examples and details... 
+
+### `nso_tenant_config.py` 
+One of the most valuable bits of network automation we use is the one that ensures Layer 2 and Layer 3 environments are configured correctly across our infrastructure.  We use the NSO Services `vlan-fabric` and `vlan-tenant` to do the configuration, but the data for the hundreds of tenants is driven by the data we input into Netbox.  The script [`nso_tenant_config.py`](netbox-scripts/nso_tenant_config.py) was developed to read in the data from Netbox and create the NSO configurations to match.  Some details on how this configration is driven... 
+
+* Netbox Tenants relate to `vlan-tenants` in NSO
+* Netbox VLAN-Groups relate to `vlan-fabrics` in NSO 
+* VLANs that belong to a tenant are used to populate the `networks` under a Tenant 
+* Prefixes assigned to VLAN are used to derive the Layer 3 details for a `network` 
+* Physical network device interfaces on switches that are **Tagged** or **Untagged** in Netbox drive the `connections` for a `vlan-tenant` `network`
+* Link Aggregation Groups (LAGs) in Netbox drive Port-channel configurations for `connections` 
+
+### `get_from_netbox.py` 
+This is a collection of helper scripts and code that prepare the Python environment for a script with the names and functions needed to make other scripts easier to write.  

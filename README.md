@@ -1,6 +1,11 @@
 # DevNet Sandbox NSO Resources 
 Within this repo you'll find a colleection of [Cisco NSO](https://developer.cisco.com/nso) resources built by the [DevNet Sandbox](https://developer.cisco.com/sandbox) team as part of their internal network automation and NetDevOps efforts.  
 
+For more information on these examples and services, please see the following resources.  
+
+* [Network Service Based Automation Part 1 – The Experience](https://blogs.cisco.com/developer/network-service-based-automation-1): Demonstration of the `vlan-fabric` and `vlan-tenant` services
+* [Network Service Based Automation Part 2 – Building Services](https://blogs.cisco.com/developer/network-service-automation-2): Technical walkthrough of building the `vlan-fabric` and `vlan-tenant` services.
+
 ## Example/Development Network
 The examples within this repository are built using a network topology that resembles the actual DevNet Sandbox network modeled with netsim.  For reference, here is a topology diagram.  
 
